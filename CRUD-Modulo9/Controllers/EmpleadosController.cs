@@ -17,8 +17,7 @@ public class EmpleadosController :  ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        return Ok(
-        _service.ObtenerTodas());
+        return Ok(_service.ObtenerTodas());
     }
 
     [HttpGet("{id}")]
