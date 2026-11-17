@@ -8,17 +8,8 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
 
-
     }
     public DbSet<Empleado> Empleado { get; set; }
 
-    //protected override void OnModelCreating(ModelBuilder modelBuilder)
-    //{
-    //    modelBuilder.Entity<Empleado>(entity =>
-    //    {
-    //        entity.ToTable("Empleado");
-    //        entity.HasKey(e => e.IdEmpleado);
-    //    });
-    //}
-
+    public DbSet<Usuario> Usuarios { get; set; }
 }

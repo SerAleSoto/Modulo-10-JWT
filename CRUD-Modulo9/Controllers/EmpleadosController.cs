@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CRUD_Modulo9.Entities;
 using CRUD_Modulo9.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CRUD_Modulo9.Controllers;
 
@@ -9,6 +10,7 @@ namespace CRUD_Modulo9.Controllers;
 public class EmpleadosController :  ControllerBase
 {
     private readonly EmpleadoService _service;
+
     public EmpleadosController(EmpleadoService service)
     {
         _service = service;
@@ -51,9 +53,12 @@ public class EmpleadosController :  ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
+        var username = User.Identity?.Name;
+
         _service.Eliminar(id);
 
         return NoContent();
