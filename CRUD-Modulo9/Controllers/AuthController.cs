@@ -24,6 +24,8 @@ namespace CRUD_Modulo9.Controllers
             if (token == null)
                 return Unauthorized();
 
+            HttpContext.Session.SetString("JwtToken", token);
+
             return Ok(new
             {
                 token

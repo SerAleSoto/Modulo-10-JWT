@@ -20,6 +20,16 @@ if (jwtKeyBytes.Length < 32)
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.Name = ".CRUD_Modulo9.Session";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -55,6 +65,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults
                 ValidAudience = builder.Configuration["Jwt:Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(jwtKeyBytes)
             };
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    if (string.IsNullOrEmpty(context.Request.Headers.Authorization))
+                        context.Token = context.HttpContext.Session.GetString("JwtToken");
+
+                    return Task.CompletedTask;
+                }
+            };
     });
 
 
@@ -68,13 +88,20 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseStaticFiles();
+
     app.UseSwagger();
 
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.InjectJavascript("/swagger-authtoken.js");
+    });
 
     app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 }
 app.UseHttpsRedirection();
+
+app.UseSession();
 
 app.UseAuthentication();
 
